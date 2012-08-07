@@ -1,0 +1,14 @@
+diff -Nur multi_c_rehash-1.1.orig/multi_c_rehash.c multi_c_rehash-1.1/multi_c_rehash.c
+--- multi_c_rehash-1.1.orig/multi_c_rehash.c	2005-04-06 16:40:37.000000000 +0300
++++ multi_c_rehash-1.1/multi_c_rehash.c	2012-07-28 22:28:07.264002792 +0300
+@@ -504,7 +504,9 @@
+ 	size_t fbaselen = strlen(fbase);
+ 	char *fbase_copy = NULL;
+ 
+-	if (fbaselen < 5 || strcmp(fbase + fbaselen - 4, ".pem"))
++	if (fbaselen < 5 || 
++	    (strcmp(fbase + fbaselen - 4, ".pem") &&
++             strcmp(fbase + fbaselen - 4, ".crt")))
+ 	    continue;
+ 	fbase_copy = BUF_strdup(fbase);
+ 	if (!fbase_copy) goto nomem;
