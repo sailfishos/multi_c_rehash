@@ -8,6 +8,7 @@ URL: http://www.j10n.org/
 Source0: %{name}-%{version}.tar.gz
 BuildRequires: pkgconfig(libcrypto)
 Patch0: hash-crt-files.patch
+Patch1: less-noisy-by-default.patch
 
 %description
 %{summary}.
@@ -19,6 +20,7 @@ Patch0: hash-crt-files.patch
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 sed -i 's,/usr/local,/usr,g' Makefile
 
 %build

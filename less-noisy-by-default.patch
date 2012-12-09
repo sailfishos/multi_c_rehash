@@ -1,0 +1,86 @@
+diff -Naur multi_c_rehash-1.1/multi_c_rehash.c multi_c_rehash-1.1-mod/multi_c_rehash.c
+--- multi_c_rehash-1.1/multi_c_rehash.c	2012-12-09 13:22:55.424277762 +0000
++++ multi_c_rehash-1.1-mod/multi_c_rehash.c	2012-12-09 13:21:37.979535851 +0000
+@@ -24,6 +24,8 @@
+ #define OPT_DO_CERTS 1U
+ #define OPT_DO_CRLS 2U
+ 
++int verbose = 0;
++
+ typedef unsigned long x509hash_type;
+ 
+ typedef enum {
+@@ -238,8 +240,10 @@
+ 	
+ 	r = HashMaker_register_x509_name(obj, xn, &coll_count, &hash);
+ 	if (r == ERR_DUPLICATE) {
+-	    fprintf(stderr,
+-		    "WARNING: Skiping duplicate %s %s\n", obj->type, fbase);
++            if (verbose) {
++	        fprintf(stderr,
++		        "WARNING: Skiping duplicate %s %s\n", obj->type, fbase);
++            }
+ 	    X509_NAME_free(xn);
+ 	    continue;
+ 	} else if (r != ERR_NONE) {
+@@ -263,7 +267,9 @@
+ 		obj->dirname, hash, obj->suffix, coll_count);
+ 	linkbase = linkpath + strlen(obj->dirname) + 1;
+ 
+-	printf(" %s", linkbase);
++        if (verbose) {
++	    printf(" %s", linkbase);
++        }
+ 	if (symlink(fbase, linkpath)) {
+ 	    if (0
+ #ifdef EPERM
+@@ -482,7 +488,9 @@
+     size_t i;
+     struct dirent *entp;
+ 
+-    printf("Doing %s\n", dirname);
++    if (verbose) {
++        printf("Doing %s\n", dirname);
++    }
+     retval = clean_dir(dirname, flags);
+     if (retval == ERR_DIR_OPEN) {
+ 	perror(dirname);
+@@ -530,7 +538,9 @@
+     for (i = 0; i < pemfiles->pa_size; ++i) {
+ 	const char *fbase = pemfiles->pa_body[i];
+ 
+-	printf("%s =>", fbase);
++        if (verbose) {
++	    printf("%s =>", fbase);
++        }
+ 	if (flags & OPT_DO_CERTS) {
+ 	    retval = HashMaker_hash_file(cert_hash_maker, fbase);
+ 	    if (retval) goto last;
+@@ -539,7 +549,9 @@
+ 	    retval = HashMaker_hash_file(crl_hash_maker, fbase);
+ 	    if (retval) goto last;
+ 	}
+-	printf("\n");
++        if (verbose) {
++	    printf("\n");
++        }
+     }
+     retval = ERR_NONE;
+     goto last;
+@@ -568,6 +580,7 @@
+     -version   print version\n\
+     -help      print this help\n\
+     -h         print this help\n\
++    -v         verbose warnings\n\
+ ");
+ }
+ 
+@@ -585,6 +598,8 @@
+ 	    flags = OPT_DO_CERTS;
+ 	else if (!strcmp(opt, "-crlonly"))
+ 	    flags = OPT_DO_CRLS;
++        else if (!strcmp(opt, "-v"))
++            verbose = 1;
+ 	else if (!strcmp(opt, "-version")) {
+ 	    printf("multi_c_rehash 1.1\n");
+ 	    goto last;
